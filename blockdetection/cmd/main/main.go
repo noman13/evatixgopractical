@@ -42,7 +42,7 @@ func GetNginxBlock(
 }
 
 func GetNginxBlocks(configContent string) *NginxBlocks {
-	
+
 }
 
 
