@@ -58,7 +58,6 @@ var buildexecuteCmd = &cobra.Command{
 			}
 		}
 		if Exe != "" {
-			Exe +=".exe"
 			cmd := exec.Command("go", "build", "-o", Exe)
 			pwd, _ := os.Getwd()
 			cmd.Dir = pwd
