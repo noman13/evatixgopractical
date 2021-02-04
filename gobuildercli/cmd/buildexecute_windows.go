@@ -74,7 +74,7 @@ var buildexecuteCmd = &cobra.Command{
 	},
 }
 func copyDirectory(source string , destination string) error {
-	trimmedSourcePath, regexPattern := TrimREGEX(source)
+	trimmedSourcePath, regexPattern := TrimREGEX(source) //configs/*.*
 	newDestination := verifyDestination(destination)
 	tempFiles, err := WalkMatch(trimmedSourcePath, regexPattern)
 	var files []string
