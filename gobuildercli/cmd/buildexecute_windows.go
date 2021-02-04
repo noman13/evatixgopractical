@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"io"
 	"log"
@@ -29,7 +30,7 @@ var Copydir string
 var Builddir string
 var Exe string
 var Excludetests string
-var master int = 0
+var Master int = 0
 // buildexecuteCmd represents the buildexecute command
 var buildexecuteCmd = &cobra.Command{
 	Use:   "buildexecute",
@@ -67,8 +68,8 @@ var buildexecuteCmd = &cobra.Command{
 				log.Println(err)
 			}
 		}
-		if Excludetests == "-run args" {
-			master = 1
+		if Excludetests == "_test" {
+			Master = 1
 		}
 	},
 }
@@ -77,17 +78,23 @@ func copyDirectory(source string , destination string) error {
 	newDestination := verifyDestination(destination)
 	tempFiles, err := WalkMatch(trimmedSourcePath, regexPattern)
 	var files []string
-	if master == 1 {
+	if Master == 1 {
 		for _, filename := range tempFiles {
-			if !strings.Contains(filename, "_test.go"){
+			if strings.Contains(filename, "_test.go") == false {
+			//fmt.Println(filename)
 				files = append(files, filename)
 			}
+		}
+	} else {
+		for _, filename := range tempFiles {
+			files = append(files, filename)
 		}
 	}
 	if err != nil {
 		return err
 	}
 	for _, filename := range files {
+		fmt.Println(filename)
 		newSource := trimmedSourcePath + filename
 		copy(newSource, newDestination, filename)
 	}
