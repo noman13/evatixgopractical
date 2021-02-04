@@ -69,7 +69,7 @@ var buildexecuteCmd = &cobra.Command{
 			}
 		}
 		if Excludetests == "_test" {
-			Master = 1
+			//log.Println(Excludetests)
 		}
 	},
 }
@@ -78,7 +78,8 @@ func copyDirectory(source string , destination string) error {
 	newDestination := verifyDestination(destination)
 	tempFiles, err := WalkMatch(trimmedSourcePath, regexPattern)
 	var files []string
-	if Master == 1 {
+	fmt.Println(Master)
+	if Excludetests=="_test" {
 		for _, filename := range tempFiles {
 			if strings.Contains(filename, "_test.go") == false {
 			//fmt.Println(filename)
