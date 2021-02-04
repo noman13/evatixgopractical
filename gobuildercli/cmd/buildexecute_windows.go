@@ -16,36 +16,30 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var Copydir string
 var Builddir string
 var Exe string
+var Excludetests string
+var master int = 0
 // buildexecuteCmd represents the buildexecute command
 var buildexecuteCmd = &cobra.Command{
 	Use:   "buildexecute",
 	Short: "Makes a copy of a folder.",
 	Long: `gobuildercli makes copy of a directory according to the passed arguments.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("buildexecute called")
-		fmt.Println(Copydir)
-		fmt.Println(Builddir)
-		fmt.Println(Exe)
-		//
-
-		//copy("./config/aa.txt", "./dest")
 
 		if Copydir != "" {
 			source := Copydir
 			currentDirectory:= "/"
-			fmt.Println(currentDirectory)
 
 			if Builddir != "" {
 				destination := Builddir
@@ -73,19 +67,28 @@ var buildexecuteCmd = &cobra.Command{
 				log.Println(err)
 			}
 		}
+		if Excludetests == "-run args" {
+			master = 1
+		}
 	},
 }
 func copyDirectory(source string , destination string) error {
 	trimmedSourcePath, regexPattern := TrimREGEX(source)
 	newDestination := verifyDestination(destination)
-	fmt.Println(trimmedSourcePath, regexPattern)
-	files, err := WalkMatch(trimmedSourcePath, regexPattern)
+	tempFiles, err := WalkMatch(trimmedSourcePath, regexPattern)
+	var files []string
+	if master == 1 {
+		for _, filename := range tempFiles {
+			if !strings.Contains(filename, "_test.go"){
+				files = append(files, filename)
+			}
+		}
+	}
 	if err != nil {
 		return err
 	}
 	for _, filename := range files {
 		newSource := trimmedSourcePath + filename
-		fmt.Println(newSource)
 		copy(newSource, newDestination, filename)
 	}
 	return err
@@ -163,4 +166,5 @@ func init() {
 	buildexecuteCmd.PersistentFlags().StringVarP(&Copydir, "copydir", "c", "", "Passes the source directory.")
 	buildexecuteCmd.PersistentFlags().StringVarP(&Builddir, "builddir", "b", "", "Passes the destination directory.")
 	buildexecuteCmd.PersistentFlags().StringVarP(&Exe, "exe", "e", "", "Compile the code as binary with given filename.")
+	buildexecuteCmd.PersistentFlags().StringVarP(&Excludetests,"exclude-tests", "t", "", "Excludes all test files")
 }
